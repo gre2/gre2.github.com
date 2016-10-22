@@ -5,7 +5,7 @@
 layout: home
 ---
 ##Posts
-<ul>
+<ul class="anchor">
   {% for post in site.posts %}
     <li>
       <a href="{{ post.url }}">{{ post.title }}</a>
