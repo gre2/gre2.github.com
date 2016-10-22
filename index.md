@@ -7,13 +7,11 @@ tagline: Coding on shoulders of Giants with music.
 
 ## Info
 
-<del>my qq is `530534714`.</del>
+my wechat is `gre2`
 
-my wechat is `hqlgree2`
+my email is `gre2` at `163.com`
 
-my email is `hqlgree2` at `gmail.com`
-
-pay a visit to my [github](http://github.com/gree2).
+pay a visit to my [github](http://github.com/gre2).
 
 ## Posts
 
