@@ -82,7 +82,7 @@ JB :
   comments :
     provider : disqus
     disqus :
-      short_name : gee2
+      short_name : gre2
     livefyre :
       site_id : 123
     intensedebate :

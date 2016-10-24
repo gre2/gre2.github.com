@@ -5,12 +5,15 @@ description: ""
 category: [jekyll, github]
 tags: [jekyll, github]
 ---
+{% include JB/setup %}
 
 ### history
 
 In about 2012 I create my github page.
 
 Today I delete that repo and recreate it.
+
+Pay a visit to this [site](http://jekyllbootstrap.com/usage/jekyll-quick-start.html) to have a quick start.
 
 ### steps on mac
 

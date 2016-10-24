@@ -1,15 +1,13 @@
 ---
 layout: page
-title: Hello World!
-tagline: Coding on shoulders of Giants with music.
+title: Running
+tagline: Efforts to run,stand higher
 ---
 {% include JB/setup %}
 
 ## Info
 
-my wechat is `gre2`
-
-my email is `gre2` at `163.com`
+my email is `15101179616` at `163.com`
 
 pay a visit to my [github](http://github.com/gre2).
 

@@ -1,11 +1,11 @@
-# [http://gree2.github.io/](http://gree2.github.io/)
+# [http://gre2.github.io/](http://gre2.github.io/)
 
-[![Build Status](https://travis-ci.org/gree2/gree2.github.com.svg?branch=master)](https://travis-ci.org/gree2/gree2.github.com)
+[![Build Status](https://travis-ci.org/gre2/gre2.github.com.svg?branch=master)](https://travis-ci.org/gre2/gre2.github.com)
 
 ## info
 
 this is my blog's source code
 
-pay a visit to my [blog](http://gree2.github.io/)
+pay a visit to my [blog](http://gre2.github.io/)
 
 enjoy your day~
