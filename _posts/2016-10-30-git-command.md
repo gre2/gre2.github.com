@@ -1,9 +1,9 @@
 ---
-layout:post
-title:"git command"
-description:""
-category:[git]
-tags:[git]
+layout: post
+title: "git command"
+description: ""
+category: [git]
+tags: [git]
 ---
 {% include JB/setup %}
 
