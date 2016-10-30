@@ -1,42 +1,34 @@
 ---
 layout: post
-title: "recreate my github page"
+title: "create my github page"
 description: ""
 category: [jekyll, github]
 tags: [jekyll, github]
 ---
 {% include JB/setup %}
 
-### history
 
-In about 2012 I create my github page.
+### steps on windows
 
-Today I delete that repo and recreate it.
+1. create repositry on github
 
-Pay a visit to this [site](http://jekyllbootstrap.com/usage/jekyll-quick-start.html) to have a quick start.
+    1. create a new repositry named [gre2.github.io]
 
-### steps on mac
+    1. where `gre2` is my github username
 
-1. create repo on github
+1. install Jekyll
+  
+    1.preparatory work
 
-    1. create a new repo named [gree2.github.io](https://github.com/gree2/gree2.github.com)
+        install ruby
+        install rubygems
 
-    1. where `gree2` is my github username
+    2.use rubygems to install jekyll
 
-1. install Jekyll-Bootstrap
-
-            $ git clone https://github.com/plusjade/jekyll-bootstrap.git gree2.github.com
-            $ cd gree2.github.com
-            $ git remote set-url origin https://github.com/gree2/gree2.github.com.git
-            $ git push origin master
+        gem install jekyll
 
 
-1. create a post
-
-    1. use rake
-
-            $ cd gree2.github.com.git
-            $ rake post title="recreate my github page"
+2. create a post
 
     1. do some edit
 
@@ -51,11 +43,9 @@ Pay a visit to this [site](http://jekyllbootstrap.com/usage/jekyll-quick-start.h
     1. commit and push
 
             $ git add .
-            $ git commit -m "recreate my github page"
+            $ git commit -m "create my github page"
             $ git push origin master
-
-1. visit my site [http://gree2.github.io](http://gree2.github.io)
 
 ### setup jekyll on windows
 
-1. [reference](http://yizeng.me/2013/05/10/setup-jekyll-on-windows/)
+1. [reference](http://jekyll.com.cn/)
