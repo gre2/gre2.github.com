@@ -1,7 +1,7 @@
 ---
 layout: page
-title: Running
-tagline: Efforts to run,stand higher
+title: 野路子
+tagline: 没事做，学学技术
 ---
 {% include JB/setup %}
 
@@ -9,7 +9,7 @@ tagline: Efforts to run,stand higher
 
 my email is `15101179616` at `163.com`
 
-pay a visit to my [github](http://github.com/gre2).
+my [github](http://github.com/gre2).
 
 ## Posts
 
