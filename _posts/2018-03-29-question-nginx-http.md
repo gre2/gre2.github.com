@@ -15,7 +15,8 @@ tags: [question]
       接到端上的报警，说是499请求超时，第一个想法就是看看resin日志，但是居然没有；紧随其后看看nginx日志，有；
      
         此时问题很明确了，直接观察nginx日志的调用请求，上图
-![](https://ws1.sinaimg.cn/large/87a42753ly1fptxxm5xfcj20zy01s74i.jpg)
+
+        ![](https://ws1.sinaimg.cn/large/87a42753ly1fptxxm5xfcj20zy01s74i.jpg)
     
     2.分析
 
