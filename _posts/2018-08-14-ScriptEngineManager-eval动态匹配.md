@@ -67,5 +67,7 @@ public class TestExecuteExpression {
         return function.toString();
     }
 }
-
 ```
+2.原理
+
+在java中执行脚本需要脚本语言对应的脚本引擎，JSR 223定义了脚本引擎的注册和查找机制，javaSE6中自带了JavaScript语言的脚本引擎，基于Mozilla的Rhino实现。
