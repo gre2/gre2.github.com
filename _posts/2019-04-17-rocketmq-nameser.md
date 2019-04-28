@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "rocketmq"
+title: "rocketmq-namserv"
 description: ""
 category: [java,基础]
 tags: [基础]
