@@ -6,7 +6,7 @@ tags: [基础]
 
 {% include JB/setup %}
 
-# Rocketmq-consumer
+# rocketmq-consumer
 
 ### 前期工作
 
@@ -64,7 +64,7 @@ public abstract class RebalanceImpl {
 
 初始化offsetStore[RemoteBrokerOffsetStore]
 
-![image](https://ws3.sinaimg.cn/large/87a42753ly1g33f19h2dmj20nu05emyc.jpg)
+![image](https://ws2.sinaimg.cn/large/87a42753ly1g33f19h2dmj20nu05emyc.jpg)
 
 
 
@@ -141,7 +141,7 @@ this.mQClientFactory.rebalanceImmediately();
 pullMessageService.executePullRequestImmediately(createPullRequest());
 ```
 
-![image](https://ws3.sinaimg.cn/large/87a42753ly1g3453g7rnpj224s0w411w.jpg)
+![image](https://ws2.sinaimg.cn/large/87a42753ly1g3453g7rnpj224s0w411w.jpg)
 
 ```java
 private PullRequest createPullRequest() {
