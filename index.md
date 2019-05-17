@@ -1,7 +1,7 @@
 ---
 layout: page
-title: 野路子
-tagline: 没事做，学学技术
+title: 为了什么？
+tagline: 为了家人！
 ---
 {% include JB/setup %}
 
