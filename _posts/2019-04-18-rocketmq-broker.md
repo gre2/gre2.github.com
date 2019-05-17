@@ -93,7 +93,18 @@ BrokerController#registerProcessor()
 ### broker-start
 
 - 启动刚刚初始化的各个管理器（消息存储启动（DefaultMessageStore.start()）；通信层启动(remotingServer.start(),fastRemotingServer.start())；brokerOuterAPI.start()；pullRequestHoldService.start()；
+
 - 启动检测所有客户端连接（clientHousekeepingService.start()）；filterServerManager.start()；brokerStatsManager.start()；brokerFastFailure.start()）
+
 - 启动时，强制注册:registerBrokerAll()
+
 - 开启定时把Broker注册到NameServer的任务
+
+### 类作用
+
+ReputMessageService：Broker在启动时，启动ReputMessageService，其每隔10ms为CommitLog里的消息生成位置信息PositionInfo，存入此消息对应的ConsumeQueue。一个ConsumeQueue对应着一个MessageQueue，Consume拉取消息时首先从ConsumeQueue里获取PositionInfo，对比tag是否匹配。匹配的话提取其在CommitLog的Offset，msg size，然后去CommitLog里查询消息。
+
+Consumer的每次消息拉取会指定一个进度，这个进度就是指ConsumeQueue里的进度，也就是从哪个位置开始提取PositionInfo，同时Broker会定期的持久化每个ConsumeQueue的消费进度。当消费请求提交的进度已经达到ConsumeQueue的最大值，也就是没有新的消息生成时，Broker挂起请求。每隔5S查看CnsumeQueue的maxOffset是否超过请求提交的Offset，如果是，则执行消息拉取。当挂起的时间超过15S时，强制结束请求。每当ConsumeQueue有新的PositionInfo生成时，匹配tag，若符合，立即唤醒消息拉取请求。执行拉取流程。
+
+ReputMessageService生成PositionInfo的同时，也会生成IndexInfo，也就是消息的索引信息，存放在Index目录下的IndexFile中。Producer在发送消息时，会为每条消息生成一个唯一的key，当然也可以自定义key。唯一的key会在发送结果中返回，用户可以使用这些key查询发送的消息。也就是说获取消息可以通过ConsumeQueue，也可以通过Index。
 
