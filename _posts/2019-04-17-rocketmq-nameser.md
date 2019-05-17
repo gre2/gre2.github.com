@@ -9,7 +9,7 @@ tags: [基础]
 
 # Rocketmq-namserv
 
-![image](https://ws1.sinaimg.cn/large/87a42753gy1g321xfwcxoj21ga0sy0zi.jpg)
+![](http://ww1.sinaimg.cn/large/87a42753ly1g34kv3o90ij21ga0sy4ai.jpg)
 
 ### 特点
 
@@ -25,7 +25,7 @@ tags: [基础]
 
 ### 数据
 
-![image](https://ws1.sinaimg.cn/small/87a42753ly1g25vfvlj61j20di09eq3r.jpg)
+![](http://ww1.sinaimg.cn/large/87a42753ly1g34kvevxyrj205k03v0so.jpg)
 
 ### 类属性
 
