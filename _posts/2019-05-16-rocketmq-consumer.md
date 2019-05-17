@@ -1,9 +1,10 @@
+---
 layout: post
 title: "rocketmq-consumer"
 description: ""
 category: [java,基础]
 tags: [基础]
-
+---
 {% include JB/setup %}
 
 # rocketmq-consumer
@@ -64,7 +65,7 @@ public abstract class RebalanceImpl {
 
 初始化offsetStore[RemoteBrokerOffsetStore]
 
-![image](https://ws2.sinaimg.cn/large/87a42753ly1g33f19h2dmj20nu05emyc.jpg)
+![](http://ww1.sinaimg.cn/large/87a42753ly1g34keqm8dbj20nu05eq5r.jpg)
 
 
 
