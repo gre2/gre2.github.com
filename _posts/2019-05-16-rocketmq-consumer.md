@@ -182,6 +182,8 @@ countDownLatch阻塞了，执行PullMessageService的run方法，也就是pullMe
 
 根据requestCode执行PullMessageProcessor.processRequest
 
+> 如果拉取不到消息case ResponseCode.PULL_NOT_FOUND:当满足条件 (`Broker` 允许挂起 && 请求要求挂起)，执行挂起请求。详细解析见：[PullRequestHoldService](http://www.iocoder.cn/RocketMQ/message-pull-and-consume-first/#pullrequestholdservice)。
+
 执行DefaultMessageStore.getMessage()，从commitlog读取数据，更新偏移量，计算剩余的偏移量。
 
 还有PullCallback回调一些逻辑：
@@ -193,6 +195,12 @@ boolean dispathToConsume = processQueue.putMessage(pullResult.getMsgFoundList())
 ```
 
 
+
+```java
+this.brokerController.getConsumerOffsetManager().commitOffset(XXX）
+```
+
+持久化消费进度，当满足 (`Broker` 非主 && 请求要求持久化进度)。
 
 ### 延迟消息
 
