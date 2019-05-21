@@ -80,14 +80,30 @@ BrokerController#registerProcessor()
 ### broker-intialize
 
 - 加载topic配置（topicConfigManager）
+
 - 加载消费进度存储（consumerOffsetManager）
+
 - 加载订阅组配置管理（subscriptionGroupManager）
+
 - 初始化存储层（DefaultMessageStore）
+
+  > ```java
+  > //用于broker层的消息落地存储，超级复杂
+  > this.messageStore =
+  >     new DefaultMessageStore(this.messageStoreConfig, this.brokerStatsManager, this.messageArrivingListener,
+  >         this.brokerConfig);
+  > ```
+
 - 初始化通讯层（remotingServer和fastRemotingServer）
+
 - 初始化线程池（sendMessageExecutor处理发送消息线程池，pullMessageExecutor处理拉取消息线程池，adminBrokerExecutor处理管理Broker线程池，clientManageExecutor处理管理Client线程池）
+
 - 将线程池（SendMessageProcessor,pullMessageProcessor,QueryMessageProcessor,ClientManageProcessor,EndTransactionProcessor,AdminBrokerProcessor）注册到netty消息处理器当中（remotingServer和fastRemotingServer对象中）
+
 - 启动相关执行任务（每天凌晨统计消息量的任务（brokerStats.record()），定时持久化消费进度(consumerOffsetManager.persist())）
+
 - 获取NameServer地址或者开启定时获取NameServer地址任务
+
 - 如果是slave：开启Slave定时从Master同步配置信息任务，如果是Master，开启增加统计日志任务；
 
 ### broker-start
