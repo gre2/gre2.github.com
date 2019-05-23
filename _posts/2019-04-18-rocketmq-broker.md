@@ -23,7 +23,6 @@ namerserver挂了对broker的影响？？？
 
 * 【生产者】接受客户端发送到消息，并存储
 * 【消费者】接受客户端的消费请求，返回消息数据
-* consumergroup消费进度存储、查询
 * topic配置管理
 * 一些其他的配置管理、查询：topic创建、删除、修改，broker配置查询、修改，消息查询，broker运行状态，producer、consumer连接，消费进度等
 

@@ -17,15 +17,13 @@ tags: [基础]
 
 任何producer，consumer，broker与所有nameserver通信，都是单向的，这种机制保证rocketmq水平扩容变的很容易
 
+nameserv只存储broker的信息，剩下的信息全部存储在broker上面
+
 ### 实现
 
 * 初始化namservController，包含namesrvConfig（namesrv相关配置），nettyServerConfig（netty的相关配置），KVConfigManager（KV配置管理），RouteInfoManager（路由信息、topic信息管理），BrokerHousekeepingService（broker管理服务）
 * NamesrvController.initialize()：加载KV配置，初始化通讯层（Netty的初始化：remotingServer对象），初始化线程池remotingExecutor，向remotingServer对象中注册DefaultRequestProcessor对象
-* 启动定时扫描notActive的broker任务；启动定时将configTable相关信息记录到日志文件中任务
-
-### 数据
-
-![](http://ww1.sinaimg.cn/large/87a42753ly1g34kvevxyrj205k03v0so.jpg)
+* 启动定时扫描notActive的broker任务；
 
 ### 类属性
 

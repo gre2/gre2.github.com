@@ -19,14 +19,13 @@ tags: [基础]
 
 * **全局顺序**：顺序发送是前提，选择同步发送形式，借助MessageQueueSelector将此topic的所有消息发送到同一个messageQueue，且只能是一个producer
 
-* **局部顺序**:和全局的不同就是不用发到一个producer中
+* **局部顺序**:和全局的不同就是不用一个producer发
 
 ### 类属性
 
 * MQClientManager#factoryTable[ConcurrentHashMap<String/* clientId */, MQClientInstance>]
 * MQClientInstance#producerTable[ConcurrentHashMap<String/* group */, MQProducerInner>]
 * DefaultMQProducerImpl#topicPublishInfoTable[ConcurrentHashMap<String/* topic */, TopicPublishInfo>]
-* NettyRemotingAbstract#responseTable[ConcurrentHashMap<Integer /* opaque */, ResponseFuture>]
 * NettyRemotingAbstract#responseTable[ConcurrentHashMap<Integer /* opaque */, ResponseFuture>]
 
 ### 流程
@@ -73,12 +72,10 @@ tags: [基础]
   > >
   > > this.pullMessageService.start();
   > >
-  > > this.pullMessageService.start();
-  > >
   > > 设置状态是running
-  >
+  > 
   > 发送心跳到Broker，上传过滤类源码到Filtersrv#sendHeartbeatToAllBrokerWithLock
-
+  
 * DefaultMQProducerImpl#sendDefaultImpl
 
   > 确认producer的状态是否是running
