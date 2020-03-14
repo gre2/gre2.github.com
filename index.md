@@ -1,7 +1,7 @@
 ---
 layout: page
-title: 为了什么？
-tagline: 为了家人！
+title: 我要飞起来
+tagline: flq
 ---
 {% include JB/setup %}
 
