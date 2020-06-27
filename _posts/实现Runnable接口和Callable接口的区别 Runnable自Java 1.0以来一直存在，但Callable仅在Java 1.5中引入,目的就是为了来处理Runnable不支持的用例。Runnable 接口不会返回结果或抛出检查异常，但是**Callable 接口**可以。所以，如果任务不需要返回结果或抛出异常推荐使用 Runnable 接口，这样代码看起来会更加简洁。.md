@@ -9,7 +9,7 @@ tags: [基础]
 
 # 并发编程
 
-### AtomicInteger
+### Atomic原子类
 
 解决synchronized包裹i++；++i去实现线程安全
 
@@ -18,18 +18,25 @@ tags: [基础]
 ### cas
 
 cas利用了jndi接口Unsafe的一些操作，映射到操作系统层面的话就是CMPXCHG指令实现的。
+自循环判断给定的偏移量是否等于内存中的偏移量，直到成功才退出。
 
-### volatile
+### 乐观锁，悲观锁
 
-* 普通共享变量
-  * 为了提高处理速度，处理器不直接和内存进行通信，而是将系统内存的数据读到内部缓存（L1，L2）后再进行操作，但操作不知何时会写到内存。
-* volatile修饰的共享变量
-  * 在多处理器下，如果对volatile变量进行写操作，JVM会向处理器发送一条Lock前缀的指令，将这个变量所在的缓存行的数据写到系统内存。为了保证各核处理器的缓存是一致的【别的线程缓存行数据】，要实现缓存一致性协议，每个处理器通过嗅探在总线上传播的数据来检查自己缓存的值是不是过期了，当处理器发现自己缓存行对应的内存地址被修改，就会将当前处理器的缓存行设置成无效状态，之后从系统内存中把数据读到处理器缓存里，保证了可见性。
-  * java内存模型具备一些先天的有序性，也就是happens-before原则【包含volatile的规则】，重排过程不会影响到单线程程序的执行，却会影响到多线程并发执行的正确性。
+* 乐观锁：版本号 or cas（aba）（只能保证一个共享变量原子操作）[自选cas时间长]，场景：多读少写
+  * JDK5之后AtomicReference可以用来保证对象之间的原子性，把多个对象放在CAS中操作
+  * 场景：订单表。怎么保证aba问题？时间戳。版本号。
+* 悲观锁：synchronized，场景：多写的场景
+
+对比：
+
+1. 对于资源竞争较少（线程冲突较轻）的情况，使用synchronized同步锁进行线程阻塞和唤醒切换以及用户态内核态间的切换操作额外浪费消耗cpu资源；而CAS基于硬件实现，不需要进入内核，不需要切换线程，操作自旋几率较少，因此可以获得更高的性能。
+2. 对于资源竞争严重（线程冲突严重）的情况，CAS自旋的概率会比较大，从而浪费更多的CPU资源，效率低于synchronized。
 
 ### ThreadLocal
 
 线程数据隔离
+
+我们创建的变量是可以被任何一个线程访问并修改的。**如果想实现每一个线程都有自己的专属本地变量该如何解决呢？** JDK中提供的`ThreadLocal`类正是为了解决这样的问题。
 
 Thread类
 
@@ -42,6 +49,10 @@ ThreadLocal类
 ```java
 private Entry[] table;
 ```
+
+ThreadLocal 内存泄露问题
+
+`ThreadLocalMap` 中使用的 key 为 `ThreadLocal` 的弱引用,而 value 是强引用。所以，如果 `ThreadLocal` 没有被外部强引用的情况下，在垃圾回收的时候，key 会被清理掉，而 value 不会被清理掉。这样一来，`ThreadLocalMap` 中就会出现key为null的Entry。假如我们不做任何措施的话，value 永远无法被GC 回收，这个时候就可能会产生内存泄露。ThreadLocalMap实现中已经考虑了这种情况，在调用 `set()`、`get()`、`remove()` 方法的时候，会清理掉 key 为 null 的记录。使用完 `ThreadLocal`方法后 最好手动调用`remove()`方法
 
 ### synchronized和Lock
 
@@ -88,17 +99,11 @@ JDK6之前通过操作系统的metuxLock(互斥锁)机制实现，重量级锁
 
 锁的信息保存在对象头的markWord字段中
 
-![](https://ws1.sinaimg.cn/large/87a42753ly1fwh020u5xnj20g3063tak.jpg)
-
-![](https://ws1.sinaimg.cn/large/87a42753ly1fwh8v51ootj20ei05nta0.jpg)
-
 - 偏向锁：为了满足一个线程在无竞争条件下访问同步代码块而设置的锁
 - 轻量级锁：为了满足多线程交替执行代码而设置的锁，采用cas和自旋来减少系统级别的互斥操作代来的性能开销
 - 重量级锁：通常锁说的互斥锁，利用操作系统的MutexLock互斥锁机制实现，通过对象内的监视器(monitor)进行加锁操作。
 
 ##### 锁膨胀过程
-
-![](https://ws1.sinaimg.cn/large/87a42753ly1fwhactzuqcj20h2096goz.jpg)
 
 reference：https://upload-images.jianshu.io/upload_images/2062729-61dfb07d48d8588c.png
 
@@ -284,7 +289,17 @@ this(corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue,
 4：单线程化的线程池 >> 核心，最大=1 其余和fixed一样
 ```
 
+* **FixedThreadPool 和 SingleThreadExecutor** ：允许请求的队列长度为 Integer.MAX_VALUE ，可能堆积大量的请求，从而导致OOM。
+* **CachedThreadPool 和 ScheduledThreadPool** ：允许创建的线程数量为 Integer.MAX_VALUE ，可能会创建大量线程，从而导致OOM。
 
+实现Runnable接口和Callable接口的区别
+
+`Runnable`自Java 1.0以来一直存在，但`Callable`仅在Java 1.5中引入,目的就是为了来处理`Runnable`不支持的用例。**Runnable 接口**不会返回结果或抛出检查异常，但是**`Callable` 接口**可以。所以，如果任务不需要返回结果或抛出异常推荐使用 **Runnable 接口**，这样代码看起来会更加简洁。
+
+执行execute()方法和submit()方法的区别是什么呢？
+
+1. **execute()方法用于提交不需要返回值的任务，所以无法判断任务是否被线程池执行成功与否；**
+2. **submit()方法用于提交需要返回值的任务。线程池会返回一个 Future 类型的对象，通过这个 Future 对象可以判断任务是否执行成功**，并且可以通过 `Future` 的 `get()`方法来获取返回值，`get()`方法会阻塞当前线程直到任务完成，而使用 `get（long timeout，TimeUnit unit）`方法则会阻塞当前线程一段时间后立即返回，这时候有可能任务没有执行完。
 
 ### 条件队列Condition
 

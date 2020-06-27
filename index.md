@@ -1,7 +1,7 @@
 ---
 layout: page
-title: 我要飞起来
-tagline: flq
+title: 1234567
+tagline: 7654321
 ---
 {% include JB/setup %}
 
