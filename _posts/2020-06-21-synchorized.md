@@ -133,7 +133,7 @@ tags: [基础]
 
   **非公平锁**是`ReentrantLock`的默认实现
 
-  
+  * 执行lock()的时候，先尝试用CAS获取一次锁，若获取不到才会进入一个队列等待锁释放
 
   ![企业微信截图_6d5fbf4c-6778-4c39-8edf-dc801e7383db.png](http://ww1.sinaimg.cn/large/87a42753ly1gg73mjs93cj21wi13sqi9.jpg)
 
@@ -143,7 +143,7 @@ tags: [基础]
 
   #### 公平锁实现
 
-  公平锁在加锁的时候，会先判断`AQS`等待队列中是存在节点，如果存在节点则会直接入队等待
+  公平锁在加锁的时候，会先判断`AQS`等待队列中是存在节点并且当前线程不是锁的持有者，如果符合会直接入队等待
 
   #### 异同
 
@@ -156,6 +156,27 @@ tags: [基础]
   `Condition`是在`java 1.5`中才出现的，它用来替代传统的`Object`的`wait()`、`notify()`实现线程间的协作，相比使用`Object`的`wait()`、`notify()`，使用`Condition`中的`await()`、`signal()`这种方式实现线程间协作更加安全和高效。
 
   ![企业微信截图_eee70064-48b7-4120-948f-dba875100738.png](http://ww1.sinaimg.cn/large/87a42753ly1gg73rtj2uij220s11cdwf.jpg)
+
+### ReentrantLock之Condition
+
+Condition 相当于一个 0-1 信号量，虽然是通过 Lock 的 API 来实例化的，但是Condition中用于线程协调的**条件队列**和AQS本身的阻塞队列是完全隔离的：
+
+* 当前线程获取锁后调用了该锁创建的条件变量，那么线程会释放获取到的锁；
+* 当前线程会被转换为`Node`节点后插入到对应条件变量的**条件队列**；
+* 之后AQS阻塞队列中其他线程就有机会获取到该锁了。
+
+### 线程调度LockSupport
+
+挂起和唤醒是线程调度中和锁的实现最密切的操作，juc 中通过一个 LockSupport 来抽象这两种操作，它是创建锁和其它同步类的基础。
+
+- LockSupport 类与每个使用它的线程都会关联一个许可证，默认调用 LockSupport 类的方法的线程是不持有许可证的
+- LockSupport 内部使用 Unsafe 类实现
+
+和Object的wait和notify的异同
+
+（1）wait和notify都是Object中的方法,在调用这两个方法前必须先获得锁对象，但是park不需要获取某个对象的锁就可以锁住线程。
+
+（2）notify只能随机选择一个线程唤醒，无法唤醒指定的线程，unpark却可以唤醒一个指定的线程。
 
 ### synchorized和ReentrantLock异同
 
@@ -183,6 +204,8 @@ tags: [基础]
 
 * synchronized能锁住方法和代码块，而Lock只能锁住代码块。
 
+* ReenTrantLock提供了一个Condition（条件）类，用来实现分组唤醒需要唤醒的线程们，而不是像synchronized要么随机唤醒一个线程要么唤醒全部线程。
+
 * Lock可以使用读锁提高多线程读效率。
 
 ### AQS的共享
@@ -190,4 +213,8 @@ tags: [基础]
 - **Semaphore(信号量)-允许多个线程同时访问：** synchronized 和 ReentrantLock 都是一次只允许一个线程访问某个资源，Semaphore(信号量)可以指定多个线程同时访问某个资源。
 - **CountDownLatch （倒计时器）：** CountDownLatch是一个同步工具类，用来协调多个线程之间的同步。这个工具通常用来控制线程等待，它可以让某一个线程等待直到倒计时结束，再开始执行。
 - **CyclicBarrier(循环栅栏)：** CyclicBarrier 和 CountDownLatch 非常类似，它也可以实现线程间的技术等待，但是它的功能比 CountDownLatch 更加复杂和强大。主要应用场景和 CountDownLatch 类似。CyclicBarrier 的字面意思是可循环使用（Cyclic）的屏障（Barrier）。它要做的事情是，让一组线程到达一个屏障（也可以叫同步点）时被阻塞，直到最后一个线程到达屏障时，屏障才会开门，所有被屏障拦截的线程才会继续干活。Cyc licBarrier默认的构造方法是 CyclicBarrier(int parties)，其参数表示屏障拦截的线程数量，每个线程调用await()方法告诉 CyclicBarrier 我已经到达了屏障，然后当前线程被阻塞。
+
+### 读写锁
+
+AQS只维护了一个state状态变量，ReentrantReadWriteLock利用其高 16 位表示读状态也就是获取该读锁的线程个数，低 16 位表示获取到写锁的线程的可重入次数。
 
