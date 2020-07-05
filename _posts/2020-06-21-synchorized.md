@@ -159,17 +159,16 @@ tags: [基础]
 
 ### ReentrantLock之Condition
 
-Condition 相当于一个 0-1 信号量，虽然是通过 Lock 的 API 来实例化的，但是Condition中用于线程协调的**条件队列**和AQS本身的阻塞队列是完全隔离的：
+* await的时候，当前线程是有锁的，加入到condition的等待队列中
+* signal的时候，当前线程是有锁的，从等待队列加到aqs的阻塞队列中
 
-* 当前线程获取锁后调用了该锁创建的条件变量，那么线程会释放获取到的锁；
-* 当前线程会被转换为`Node`节点后插入到对应条件变量的**条件队列**；
-* 之后AQS阻塞队列中其他线程就有机会获取到该锁了。
+至于具体的锁竞争和condition无关，condition只是在操作锁的挂起和唤醒，不操作锁的获取
 
-### 线程调度LockSupport
+### 线程调度LockSupport（先unpark再park）
 
 挂起和唤醒是线程调度中和锁的实现最密切的操作，juc 中通过一个 LockSupport 来抽象这两种操作，它是创建锁和其它同步类的基础。
 
-- LockSupport 类与每个使用它的线程都会关联一个许可证，默认调用 LockSupport 类的方法的线程是不持有许可证的
+- LockSupport和每个使用它的线程都与一个许可(permit)关联。permit相当于1，0的开关，默认是0，调用一次unpark就加1变成1，调用一次park会消费permit, 也就是将1变成0，同时park立即返回。再次调用park会变成block（因为permit为0了，会阻塞在这里，直到permit变为1）, 这时调用unpark会把permit置为1。每个线程都有一个相关的permit, permit最多只有一个，重复调用unpark也不会积累。
 - LockSupport 内部使用 Unsafe 类实现
 
 和Object的wait和notify的异同

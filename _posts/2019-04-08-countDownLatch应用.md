@@ -36,3 +36,8 @@ public class Test{
 }
 ```
 
+#### 原理
+
+* 初始化的时候给state赋值，代表countDownLatch的剩余次数
+* await的时候判断计数器是否等于0，不等于创建Node节点，加入AQS阻塞队列挂起
+* down的时候通过释放锁对计数器减一，当state=0的时候唤醒AQS阻塞队列里面的全部节点
