@@ -177,6 +177,8 @@ tags: [基础]
 
 （2）notify只能随机选择一个线程唤醒，无法唤醒指定的线程，unpark却可以唤醒一个指定的线程。
 
+（3）notify先唤醒后await会死锁，LockSupport不会，因为是许可证
+
 ### synchorized和ReentrantLock异同
 
 * **两者都是可重入锁**
