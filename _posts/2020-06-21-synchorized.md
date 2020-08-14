@@ -209,10 +209,32 @@ tags: [基础]
 
 * Lock可以使用读锁提高多线程读效率。
 
+### AQS的node状态
+
+- shared ：共享模式
+- exclusive：独占模式
+- cancelled=1：当前节点的线程是已取消的
+- signal=-1：当前节点的线程是需要被唤醒的
+- condition=-2：当前节点的线程正在等待某个条件
+- propagate=-3：表示下一个共享模式的节点应该无条件的传播下去
+
 ### AQS的共享
 
 - **Semaphore(信号量)-允许多个线程同时访问：** synchronized 和 ReentrantLock 都是一次只允许一个线程访问某个资源，Semaphore(信号量)可以指定多个线程同时访问某个资源。
+
 - **CountDownLatch （倒计时器）：** CountDownLatch是一个同步工具类，用来协调多个线程之间的同步。这个工具通常用来控制线程等待，它可以让某一个线程等待直到倒计时结束，再开始执行。
+
+  - 工作步骤
+
+  ​          初始化时定义几个任务，即同步器中state的数量
+
+  ​          等待线程执行await方法等待state变成0，等待线程会进入同步器的等待队列
+
+  ​          任务线程执行countDown方法之后，state值减1，知道减到0，唤醒等待队列中所有的等待线程
+
+  - 同步器
+    实现了tryAcquireShared方法，判断state！=0的时候把等待线程加入到等待队列并阻塞等待线程，state=0的时候这个latch就不能够再向等待队列添加等待线程；另外实现了tryReleaseShared，判断当前任务是否是最后一个任务，当state减到0的时候就是最后一个任务，然后会以传播唤醒的方式唤醒等待队列中的所有等待线程。
+
 - **CyclicBarrier(循环栅栏)：** CyclicBarrier 和 CountDownLatch 非常类似，它也可以实现线程间的技术等待，但是它的功能比 CountDownLatch 更加复杂和强大。主要应用场景和 CountDownLatch 类似。CyclicBarrier 的字面意思是可循环使用（Cyclic）的屏障（Barrier）。它要做的事情是，让一组线程到达一个屏障（也可以叫同步点）时被阻塞，直到最后一个线程到达屏障时，屏障才会开门，所有被屏障拦截的线程才会继续干活。Cyc licBarrier默认的构造方法是 CyclicBarrier(int parties)，其参数表示屏障拦截的线程数量，每个线程调用await()方法告诉 CyclicBarrier 我已经到达了屏障，然后当前线程被阻塞。
 
 ### 读写锁
