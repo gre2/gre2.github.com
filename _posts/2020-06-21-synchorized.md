@@ -209,6 +209,12 @@ tags: [基础]
 
 * Lock可以使用读锁提高多线程读效率。
 
+* 效率比较（看场景）
+
+  * 偏向锁阶段（cas）和lock差不多
+  * 轻量级锁阶段lock比较好
+  * 重量级锁阶段synchronized比较好，没有那么多的自旋cas
+
 ### AQS的node状态
 
 - shared ：共享模式
