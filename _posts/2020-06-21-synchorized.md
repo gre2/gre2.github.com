@@ -157,14 +157,14 @@ tags: [基础]
 
   ![企业微信截图_eee70064-48b7-4120-948f-dba875100738.png](http://ww1.sinaimg.cn/large/87a42753ly1gg73rtj2uij220s11cdwf.jpg)
 
-### ReentrantLock之Condition
+### ReentrantLock之应用Condition
 
 * await的时候，当前线程是有锁的，加入到condition的等待队列中
 * signal的时候，当前线程是有锁的，从等待队列加到aqs的阻塞队列中
 
 至于具体的锁竞争和condition无关，condition只是在操作锁的挂起和唤醒，不操作锁的获取
 
-### 线程调度LockSupport（先unpark再park）
+### ReentrantLock底层实现线程调度LockSupport（都是静态方法）（先unpark再park）
 
 挂起和唤醒是线程调度中和锁的实现最密切的操作，juc 中通过一个 LockSupport 来抽象这两种操作，它是创建锁和其它同步类的基础。
 
