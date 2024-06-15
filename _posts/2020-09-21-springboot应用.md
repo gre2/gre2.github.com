@@ -56,3 +56,10 @@ boot启动时会扫描以下位置的application.properties和application.yaml�
 那我们就要先把强制cglib的开关关闭，在配置文件里面配置，之后找到想实现的功能加上开关
 * boot搜索xxxAutoConfiguration（xxx是你想找的功能，比如aop，mvc之类的）通过模糊搜索找到实现类，之后回归第一步
 
+### @Import注解
+* 简介：被修饰的类，作为bean加载到spring容器。@Configuration + @Import =@Bean
+* 方式
+  * 静态注入
+  * 实现ImportSelector接口，实现selectImport方法
+  * 实现了ImportBeanDefinitionRegister接口，实现registerImportBeanDefinition方法
+
