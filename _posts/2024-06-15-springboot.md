@@ -16,8 +16,7 @@ tags: [boot]
 * https://github.com/spring-projects/spring-boot/releases
 * 下载对应版本的源码（课程中采用spring-boot-2.2.9.RELEASE）
 
-![](https://img.picgo.net/2024/06/15/image-202011171122596782a60f1e1c30759c0.png)
-![image-20201117112259678](../picture/extra/boot/image-20201117112259678.png)
+![image-20201117112259678](https://img.picgo.net/2024/06/15/image-202011171122596782a60f1e1c30759c0.png)
 
 ### 1.2  环境准备
 
