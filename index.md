@@ -1,7 +1,7 @@
 ---
 layout: page
-title: 1234567
-tagline: 7654321
+title: 今天刷算法
+tagline: 明天刷源码，offer快到碗里来，加油加油！！！
 ---
 {% include JB/setup %}
 

@@ -16,7 +16,7 @@ tags: [boot]
 * 最大连接数
 * 最大队列数（额外加一个超时时间）
 boot有默认的参数值，具体参考autoconfigure包里面的spring.configuration-metadata.json里面的配置
-  ![](../picture/boot-qingqiushu.png)
+  
 原理很简单，来了100个人，最大连接放了30个，最大队列放了10个，还有60个进行观望，在超时间内就等待，在超时时间外就放弃
 进去的30个人，判断是不是大于最小，如果大于最小，找到最大的个数，多出来的放等待队列里面。
 
