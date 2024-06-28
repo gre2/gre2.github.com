@@ -83,7 +83,7 @@ boot启动时会扫描以下位置的application.properties和application.yaml�
     * BeanUtils.instantiateClass(contextClass)，实例化出来应用上下文对象
   * 刷新应用上下文准备阶段(把启动类放到BeanDefinitionMap中，回头ioc会创建)
     * 设置容器环境对象放到上下文里面
-    * 执行容器后置处理postProcessApplicationContext ？？？？没说啊
+    * 执行容器后置处理postProcessApplicationContext 
     * 将main函数中的args参数封装成单例Bean，注册进容器
     * 将启动类放到容器里面load(context, sources.toArray(new Object[0])); 第一个参数是容器对象，第二个参数是启动类
       * 判断启动类是否包含@Component注解（先看启动类的注解有没有，之后拿到启动类注解里面的注解，再拿到更上一层的注解，反正就是往上找）
