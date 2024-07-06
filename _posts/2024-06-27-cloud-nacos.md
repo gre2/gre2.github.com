@@ -8,14 +8,6 @@ tags: [cloud]
 {% include JB/setup %}
 
 
-### ribbon
-    三个组件：rule，ping，loadBalancer
-feign通过@LoadBalanced注解可以达到负载均衡的效果，在restTemplate对象上面放上注解即可
-
-1.找到@LoadBalanced注解的位置，
-
-### feign
-    两个组件：ribbon，restTemplate
-
+### nacos
 
  

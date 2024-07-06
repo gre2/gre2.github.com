@@ -28,6 +28,7 @@ tags: [cloud]
     * @bean查找匹配到route并进行处理RoutePrdicateHandlerMapping（重要 ）[下面mapping.getHandler找路由的实现类]
     * @bean加载网关配置gatewayProperties[yaml文件读取类]
     * @bean创建一个根据routedefition转换的路由定位器RouteDefinitionRouteLocator[路由类]
+    
 ```
 spring:
      cloud:
@@ -41,6 +42,7 @@ spring:
            # 为原始请求添加名为X-Request-Foo，值为Bar的请求头信息
            - AddRequestHeader=X-Request-Foo,Bar
 ```
+
 * 请求过来打到网关[读取yaml组成routes，筛选得到route]
 * DispatcherHandler.handle方法（DispatcherHandler类似mvc中的dispatherServlet对象）
 * 走到mapping.getHandler方法，走到实现类RoutePrdicateHandlerMapping.getHandlerInternal方法 ，里面执行lookupRoute方法[把配置文件里面的数据映射成route路由，放到httpServletRequest里面]
@@ -73,6 +75,7 @@ spring:
        filters:
          - CheckStatus
     ```
+    
   * ```java
        @Service
        public class CheckStatusGatewayFilterFactory extends AbstractGatewayFilterFactory {
@@ -88,6 +91,7 @@ spring:
          }
        }
     ```
+    
 * 登录和鉴权
   * 所有功能都类似，就是自定义filter之后改下配置，业务操作，传递数据可以用exchange，链式调用exhcange走不同的过滤器
 * 平滑切换服务（灰度）
