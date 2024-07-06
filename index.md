@@ -1,7 +1,7 @@
 ---
 layout: page
-title: 今天刷算法
-tagline: 明天刷源码，offer快到碗里来，加油加油！！！
+title: A方案搞不定，可以换成B方案啊。
+tagline: 程序是理科不是文科，需要的是理解不是背书。
 ---
 {% include JB/setup %}
 

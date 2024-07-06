@@ -19,7 +19,7 @@ tags: [cloud]
 * 走别的过滤器逻辑
 * 走发送请求的过滤器nettyRouteFilter，真正的发送请求
 
-### gateway [里面ribbon初始化在ribbon模块说]
+### 细节 [里面ribbon初始化在ribbon模块说]
 * 初始化流程：spring-cloud-gateway-core.jar里面spring.factories里面的自动加载类[gatewayAutoConfiguration]
 * 核心：gatewayLoadBalancerAutoConfiguration（负载均衡相关）+gatewayAutoConfiguration（网关核心配置里面包含几个重要的东西）
   * gatewayLoadBalancerAutoConfiguration组成：
