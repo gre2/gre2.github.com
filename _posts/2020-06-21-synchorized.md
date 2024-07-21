@@ -181,6 +181,20 @@ tags: [基础]
 
 （3）notify先唤醒后await会死锁，LockSupport不会，因为是许可证
 
+### Lock[公平]
+* 拿state[volatile],看队列是否需要排队，不需要排队，直接加锁，锁里面的线程改成当前线程。判断是否是当前先线程的重入锁，，不是的化返回false。或者加锁成功
+* 加锁不成功去入队，如果是多个线程并发，并发的线程都需要入队
+* 修改前面node的waitstate状态，之后park[阻塞]
+
+### CAS
+* 原子性问题：lock+cmpxchgq 缓存行锁/总线锁 
+* ABA
+* 轻量级锁和重量级锁性能（空转耗Cpu。线程多放队列，不耗cpu。重量级锁。）
+
+### LongAddr
+* 分段cas，base+cell数组。多线程的化，避免cas空转，操作cell数组，最后获取值的时候把base和cell数组的值加起来。
+* 线程多，自动分配cell数组，线程少了就会减少使用cell数组的个数，如果很少有可能只用base，不用cell数组。
+
 ### synchorized和ReentrantLock异同
 
 * **两者都是可重入锁**
