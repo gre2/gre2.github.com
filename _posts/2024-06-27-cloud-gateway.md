@@ -63,6 +63,10 @@ spring:
   * 最后发起请求[也是过滤器中的一个全局过滤器，为什么可以最后执行，前面串过滤器链的时候按照order排序了]，真正发起请求的类是nettyRouteFilter.filter ，逻辑其实就是httpclient走网络请求。
 
 ### gateway应用[全都是filter的应用]
+* 灰度
+  * 两套route
+* 自定义负载均衡策略
+  * 通过实现LoadBalancerClientFilter的方式来自定义负载均衡策略
 * 自定义filter
   * 写代码，实现全局globalFilter，写逻辑。不容易扩展
   * 写代码继承AbstractGatewayFilterFactory，可以设置成根据path配置的，也可以设置成所有path的
