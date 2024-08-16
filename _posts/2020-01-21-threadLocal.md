@@ -35,5 +35,111 @@ private static int prevIndex(int i, int len) {
 
 ThreadLocalMap实现中已经考虑了这种情况，在调用 set()、get()、remove() 方法的时候，会清理掉 key 为 null 的记录。如果说会出现内存泄漏，那只有在出现了 key 为 null 的记录后，没有手动调用 remove() 方法，并且之后也不再调用 get()、set()、remove() 方法的情况下。
 
+#### 问题1：ThreadLocal是什么，为什么使用它
+
+并发场景下，会存在多个线程同时修改一个共享变量的场景。这就可能会出现线性安全问题。ThreadLocal起到线程隔离的作用，避免了并发场景下的线程安全问题。
+使用ThreadLocal类访问共享变量时，会在每个线程的本地，都保存一份共享变量的拷贝副本。多线程对共享变量修改时，实际上操作的是这个变量副本，从而保证线性安全。
+
+#### 问题2：key是弱引用，GC回收会影响ThreadLocal的正常工作嘛？
+其实不会的，因为有ThreadLocal变量引用着它，是不会被GC回收的，除非手动把ThreadLocal变量设置为null，我们可以跑个demo来验证一下：
+```java
+
+public class WeakReferenceTest {
+    public static void main(String[] args) {
+        Object object = new Object();
+        WeakReference<Object> testWeakReference = new WeakReference<>(object);
+        System.out.println("GC回收之前，弱引用："+testWeakReference.get());
+        //触发系统垃圾回收
+        System.gc();
+        System.out.println("GC回收之后，弱引用："+testWeakReference.get());
+        //手动设置为object对象为null
+        object=null;
+        System.gc();
+        System.out.println("对象object设置为null，GC回收之后，弱引用："+testWeakReference.get());
+    }
+}
+运行结果：
+GC回收之前，弱引用：java.lang.Object@7b23ec81
+GC回收之后，弱引用：java.lang.Object@7b23ec81
+对象object设置为null，GC回收之后，弱引用：null
+```
+
+内存泄露的例子
+```java
+public class ThreadLocalTestDemo {
+ 
+    private static ThreadLocal<TianLuoClass> tianLuoThreadLocal = new ThreadLocal<>();
+ 
+ 
+    public static void main(String[] args) throws InterruptedException {
+ 
+        ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(5, 5, 1, TimeUnit.MINUTES, new LinkedBlockingQueue<>());
+ 
+        for (int i = 0; i < 10; ++i) {
+            threadPoolExecutor.execute(new Runnable() {
+                @Override
+                public void run() {
+                    System.out.println("创建对象：");
+                    TianLuoClass tianLuoClass = new TianLuoClass();
+                    tianLuoThreadLocal.set(tianLuoClass);
+                    tianLuoClass = null; //将对象设置为 null，表示此对象不在使用了
+                   // tianLuoThreadLocal.remove();
+                }
+            });
+            Thread.sleep(1000);
+        }
+    }
+ 
+    static class TianLuoClass {
+        // 100M
+        private byte[] bytes = new byte[100 * 1024 * 1024];
+    }
+}
+ 
+ 
+创建对象：
+创建对象：
+创建对象：
+创建对象：
+Exception in thread "pool-1-thread-4" java.lang.OutOfMemoryError: Java heap space
+ at com.example.dto.ThreadLocalTestDemo$TianLuoClass.<init>(ThreadLocalTestDemo.java:33)
+ at com.example.dto.ThreadLocalTestDemo$1.run(ThreadLocalTestDemo.java:21)
+ at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149)
+ at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)
+ at java.lang.Thread.run(Thread.java:748)
+```
+
+#### 问题3：ThreadLocal的Key为什么要设计成弱引用呢？
+
+其实我感觉没啥用，如果不执行set get remove依然存在内存溢出的问题，可是反之如果都执行这些命令了，那我直接强引用执行=null不也可以吗？或者用软引用也没啥不可以的啊。
+
+#### 问题4： InheritableThreadLocal保证父子线程间的共享数据
+```java
+public class InheritableThreadLocalTest {
+ 
+   public static void main(String[] args) {
+       ThreadLocal<String> threadLocal = new ThreadLocal<>();
+       InheritableThreadLocal<String> inheritableThreadLocal = new InheritableThreadLocal<>();
+ 
+       threadLocal.set("关注公众号：捡田螺的小男孩");
+       inheritableThreadLocal.set("关注公众号：程序员田螺");
+ 
+       Thread thread = new Thread(()->{
+           System.out.println("ThreadLocal value " + threadLocal.get());
+           System.out.println("InheritableThreadLocal value " + inheritableThreadLocal.get());
+       });
+       thread.start();
+       
+   }
+}
+//运行结果
+ThreadLocal value null
+InheritableThreadLocal value 关注公众号：程序员田螺
+```
+
+如果当前线程的inheritableThreadLocals不为null，就从父线程哪里拷贝过来一个过来，类似于另外一个ThreadLocal，数据从父线程那里来的。
+
+
+
  
 

@@ -201,7 +201,7 @@ tags: [基础]
 
   两者都是可重入锁。“可重入锁”概念是：自己可以再次获取自己的内部锁。比如一个线程获得了某个对象的锁，此时这个对象锁还没有释放，当其再次想要获取这个对象的锁的时候还是可以获取的，如果不可锁重入的话，就会造成死锁。同一个线程每次获取锁，锁的计数器都自增1，所以要等到锁的计数器下降为0时才能释放锁。
 
-* **synchronized 依赖于 JVM 而 ReentrantLock 依赖于 API**
+* **synchronized（关键字） 基于objectMonitor 而 ReentrantLock（类） 基于AQS
 
   synchronized 是依赖于 JVM 实现的，前面我们也讲到了 虚拟机团队在 JDK1.6 为 synchronized 关键字进行了很多优化，但是这些优化都是在虚拟机层面实现的，并没有直接暴露给我们。ReentrantLock 是 JDK 层面实现的（也就是 API 层面，需要 lock() 和 unlock() 方法配合 try/finally 语句块来完成），所以我们可以通过查看它的源代码，来看它是如何实现的。
 
@@ -231,10 +231,64 @@ tags: [基础]
   * 轻量级锁阶段lock比较好
   * 重量级锁阶段synchronized比较好，没有那么多的自旋cas
 
+### Lock大致加锁流程（非公平就是没事就抢一手试试看能不能拿到锁，或者没事就判断下当前持有锁的线程是不是自己，为了重入的逻辑准备。重入巧妙的处理是超过Integer.MAX+1之后，这个数是复数了）
+* 线程A先执行CAS，将state从0变成1，线程A获取到了资源锁，执行业务代码
+* 线程B执行CAS，发现state已经是1，无法获取资源
+* 线程B去排队，将自己封装成Node对象（waitStatus，next，pre，锁类型，Thread）
+* 需要将线程B的Node放到双向队列保存，排队
+  * 但是双向链表需要有一个伪节点作为头节点，并且放到双向队列中
+  * 将B线程的Node挂到tail后面，并且将上一个节点的状态改为-1，用LockSupport挂起B线程
+  
+### Lock.lock()加锁方法（head-Node1-Node2-tail）默认Node应该是waitStatus=0 + thread=null
+* acquire方法
+  * tryAcquire：当status=0，CAS获取锁。判断持有锁的线程是不是自己，是自己，重入。都不是往下走acquireQueued。如果是公平锁的逻辑多了一个status=0的时候判断下有没有人排队，如果没有人排队，或者自己是排队的第一个走非公平锁的逻辑。如果别人是第一个排队的，那自己不抢了。
+  * acquireQueued（addWaiter（））
+    * addWaiter：没有拿到锁，封装当前线程为Node，插入AQS，插入方式是CAS方式。（将新Node指向排队的最后一个节点，之后将tail指向新Node，最后之前的最后排队的指向新Node），里面比较巧妙的点是如果CAS放队尾失败（多个线程）或者伪节点释放（会在enq中构建一个空的伪节点），会执行enq方法，里面利用死循环的方式，保证当前线程的Node肯定可以放到AQS的尾部。
+    * acquireQueued：查看自己是否是第一个排队的节点，如果是CAS获取锁，如果不是线程挂起。（如果是队列第一个，执行tryAcquire获取锁，如果拿到锁，设置头节点为当前获取锁资源的Node。如果没有资格拿锁资源）
+      * 没有拿到锁资源或者没有资格拿到锁资源（不是队列第一位）【死循环】
+      * shouldParkAfterFailAcquire：看下线程能否挂起（确认前节点是否具备唤醒当前要挂起线程的条件）
+        * 前一个Node的状态waitStatus=-1，当前Node具备挂起条件。
+        * 前一个Node的状态waitStatus大于0，那就代表这个Node是取消状态cancel=1，那就循环往上找，找到不大于0的Node节点，最次是头节点，当前Node不具备挂起条件。
+        * 前一个Node的状态waitStatus不是0和-1，那就是-2（和Condition相关先不不看），-3（和共享锁相关）和大于0的数，那就代表节点状态正常，当前Node不具备挂起条件。
+        * 如果是第三个情况，执行compareAndSetWaitStatus，将找到的上一个节点的状态改为-1
+      * 因为acquireQueued中的方法是死循环，死循环里面的逻辑，要不是拿到锁，要不是当前线程具备挂起条件。
+      * 如果具备挂起条件，利用LockSupport挂起线程。
+      * finally里面的逻辑cancelAcquire走不到，不用看
+  * selfInertrupt：中断线程（lock方法不需要考虑中断，tryLock和lockInterrupt方法才需要考虑）
+
+### Lock，tryLock() + Lock.tryLock(time,unit)
+* Lock，tryLock()=tryAcquire方法。就拿一次，成功或者失败
+* Lock.tryLock(time,unit)：
+  * 线程中断标识为true，直接抛异常
+  * tryAcquire：公平+非公平，拿锁成功，直接结束，拿锁没有成功，走doAcquireNanos方法
+  * doAcquireNanos：
+    * 等待时间是0秒，结束
+    * 设置结束时间
+    * addWaiter，扔AQS里面，之后下面执行一个死循环（拿锁+挂起）
+    * 死循环，队列第一个，直接抢锁，抢到结束
+    * 死循环，抢不到锁，算下剩余的时间，结束
+    * 死循环，shouldParkAfterFailAcquire看能不能挂起，挂起剩余的时间LockSupport.parkNanos。到时间了，自动被唤醒，不需要别的线程唤醒。
+    * 如果线程被唤醒了，如果是中断唤醒，那抛异常，走finally中的cancelAcquire方法，如果到时间唤醒，结束。
+  * cancelAcquire（线程thread设置为null，waitStatus=1，改变链表指针【让tail指向前面有效的Node】，脱离AQS队列）
+    * 脱离AQS队列，当前节点是tail节点，往前找到有效节点（跳过前面的被取消节点，找到有效的）改变指向
+    * 脱离AQS队列，当前节点是队列第一个节点，唤醒后面的节点LockSupport.unpark，节点改变指向
+    * 脱离AQS队列，当前节点是中间节点，节点改变指向
+
+### Lock，lockInterrupt()和  Lock.tryLock(time,unit)类似，没啥说的
+
+### Lock释放锁（head,Node1【waitStatus=-1，thread=null】,Node2【waitStatus=-1，thread=B】,Node3【waitStatus=0，thread=C】,tail）
+* Node1是默认的，默认Node应该是waitStatus=0 + thread=null，但是后面有线程，所以waitStatus=-1了。
+* 线程A持有当前锁，state=2，重入了一次 
+* 线程B和线程C获取锁资源失败，在AQS中排队
+* 线程A释放锁，调用unlock方法，执行tryRelease方法
+* 判断锁资源是不是被线程A持有，如果不是，抛异常（对使用错误进行了一个校验），结束
+* 锁被线程A持有，对state-1 
+  * -1成功后，判断state是否为0，如果不是，方法结束
+  * 如果为0，证明当前线程锁资源释放完毕了
+  * 查看头节点状态，为-1，后续有挂起的节点，找到有效的Node，把state改为0，唤醒
+
 ### AQS的node状态
 
-- shared ：共享模式
-- exclusive：独占模式
 - cancelled=1：当前节点的线程是已取消的
 - signal=-1：当前节点的线程是需要被唤醒的
 - condition=-2：当前节点的线程正在等待某个条件
