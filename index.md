@@ -1,7 +1,7 @@
 ---
 layout: page
-title: A方案搞不定，可以换成B方案啊。
-tagline: 程序是理科不是文科，需要的是理解不是背书。
+title: A方案搞不定，换B方案啊。
+tagline: 程序源于生活，不要背书嘛。
 ---
 {% include JB/setup %}
 
